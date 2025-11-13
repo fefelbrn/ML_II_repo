@@ -6,6 +6,10 @@ Complete ML Pipeline: From EDA to Predictive Analysis
 This script contains the complete machine learning pipeline for predicting
 tsunami occurrence based on earthquake characteristics.
 
+NOTE: This script does NOT include visualization code (plots, charts, etc.)
+      to avoid spamming plots when running from command line.
+      If you want to see visualizations, please run the Jupyter notebook instead.
+
 Structure:
   Part 1: Exploratory Data Analysis
   Part 2: Machine Learning Pipeline Setup
@@ -27,7 +31,8 @@ import sys
 import numpy as np
 import pandas as pd
 
-import matplotlib.pyplot as plt
+# Note: matplotlib import removed - visualizations are in the notebook only
+# import matplotlib.pyplot as plt
 
 from itertools import product
 from scipy.stats import randint, uniform
@@ -47,7 +52,7 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
+from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, TimeSeriesSplit
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder
@@ -90,12 +95,12 @@ print()
 # We begin by examining the basic structure and characteristics of our dataset to get a first understanding of the data we're working with.
 
 # Basic Statistical Summary
-# This code generates descriptive statistics for all numeric columns in the dataset, including count, mean, standard deviation, min, max, and quartiles. This provides an initial overview of the data distribution, helping us understand the scale, spread, and potential outliers in our features. It's the first step in understanding our data before diving deeper into more specific analyses. The resulting summary table shows statistical measures for each numeric column, revealing the central tendencies and variability of our earthquake features, which will guide our subsequent exploratory work.
+# This code generates descriptive statistics for all numeric columns in the dataset, including count, mean, standard deviation, min, max, and quartiles. This gave us an initial overview of the data distribution, helping us understand the scale, spread, and potential outliers in our features. It's the first step in understanding our data before diving deeper into more specific analyses. The resulting summary table shows statistical measures for each numeric column, revealing the central tendencies and variability of our earthquake features, which will guide our subsequent exploratory work.
 
 df.describe()
 
 # Display First Rows
-# This code displays the first few rows of the dataset to inspect the actual data values and structure. This allows us to see the raw data format, column names, and sample values, which helps verify that the data was loaded correctly and gives us a sense of what each feature looks like in practice. The resulting table shows the first 5 rows with all columns visible, providing concrete examples of earthquake data entries that we'll be working with throughout the analysis.
+# This code displays the first few rows of the dataset to inspect the actual data values and structure. This made it us to see the raw data format, column names, and sample values, which helps verify that the data was loaded correctly and gives us a sense of what each feature looks like in practice. The resulting table shows the first 5 rows with all columns visible, providing concrete examples of earthquake data entries that we'll be working with throughout the analysis.
 
 df.head()
 
@@ -143,7 +148,7 @@ year_cls = df.groupby(["Year", "tsunami"]).size().unstack(fill_value=0)
 # Magnitude is a key feature for earthquake characterization. We examine its distribution and relationship with tsunami occurrence.
 
 # Visualize Temporal Trends
-# This code creates a stacked bar chart showing the number of events per year, with different colors for tsunami (class 1) and non-tsunami (class 0) events. Visual representation makes it easier to spot temporal trends and patterns, allowing us to see if tsunami events are increasing or decreasing over time, or if certain years had unusual activity. This visualization informs our understanding of the data and potential temporal dependencies that might need to be accounted for in our models. The resulting bar chart has years on the x-axis and event counts on the y-axis, with each bar stacked to show the proportion of tsunami versus non-tsunami events per year, clearly revealing temporal patterns in the data.
+# This code creates a stacked bar chart showing the number of events per year, with different colors for tsunami (class 1) and non-tsunami (class 0) events. Visual representation makes it easier to spot temporal trends and patterns, so we could see if tsunami events are increasing or decreasing over time, or if certain years had unusual activity. This visualization informs our understanding of the data and potential temporal dependencies that might need to be accounted for in our models. The resulting bar chart has years on the x-axis and event counts on the y-axis, with each bar stacked to show the proportion of tsunami versus non-tsunami events per year, clearly revealing temporal patterns in the data.
 
 year_cls
 
@@ -153,12 +158,13 @@ year_cls
 # Geographic Analysis
 # Geographic location plays an important role in tsunami occurrence due to tectonic plate boundaries and coastal geography. We analyze the geographic distribution of events and tsunami rates by country.
 
-plt.figure()
-year_cls.plot(kind="bar", stacked=True)
-plt.title("Nombre d'événements par an et par classe (tsunami 0/1)")
-plt.xlabel("Année"); plt.ylabel("Nombre d'événements")
-plt.tight_layout()
-plt.show()
+# Plot removed - see notebook for visualizations
+# plt.figure()
+# year_cls.plot(kind="bar", stacked=True)
+# plt.title("Nombre d'événements par an et par classe (tsunami 0/1)")
+# plt.xlabel("Année"); plt.ylabel("Nombre d'événements")
+# plt.tight_layout()
+# plt.show()
 
 # Magnitude Distribution by Class
 # This code creates a stacked bar chart showing the distribution of events across magnitude bins, broken down by tsunami class, which reveals whether certain magnitude ranges are more associated with tsunamis. This analysis helps identify if there's a relationship between earthquake magnitude and tsunami occurrence, as if higher magnitude bins show more tsunamis, magnitude is likely a strong predictive feature. This visualization makes the relationship clear and helps us understand how magnitude relates to the target variable. The resulting stacked bar chart has magnitude bins on the x-axis, with each bar showing the proportion of tsunami versus non-tsunami events in that magnitude range, revealing whether higher magnitudes correlate with tsunami occurrence.
@@ -167,23 +173,25 @@ bins = np.arange(0, 11, 1)
 labels = [f"{i}" for i in range(0, 10)]
 df["_mag_bin"] = pd.cut(df["magnitude"].clip(lower=0, upper=10), bins=bins, labels=labels, include_lowest=True)
 mag_counts = df["_mag_bin"].value_counts().sort_index()
-plt.figure()
-mag_counts.plot(kind="bar")
-plt.title("Répartition par tranches de magnitude (globale)")
-plt.xlabel("Tranche de magnitude"); plt.ylabel("Nombre")
-plt.tight_layout()
-plt.show()
+# Plot removed - see notebook for visualizations
+# plt.figure()
+# mag_counts.plot(kind="bar")
+# plt.title("Répartition par tranches de magnitude (globale)")
+# plt.xlabel("Tranche de magnitude"); plt.ylabel("Nombre")
+# plt.tight_layout()
+# plt.show()
 
 # Geographic Analysis: Country Identification
 # This code uses reverse geocoding to convert latitude/longitude coordinates into country names, then counts how many events occurred in each country and creates a cross-tabulation of the top 15 countries by tsunami class. Geographic location is important for tsunami prediction as some regions are more prone to tsunamis, such as the Pacific Ring of Fire, and understanding which countries have the most events and their tsunami rates can reveal geographic patterns that might be useful as features in our models. The resulting table shows the top 15 countries with the most earthquake events, broken down by tsunami class, which reveals geographic hotspots and whether certain regions have higher tsunami rates that could be informative for prediction.
 
 mag_cls = df.groupby(["_mag_bin", "tsunami"]).size().unstack(fill_value=0).reindex(labels)
-plt.figure()
-mag_cls.plot(kind="bar", stacked=True)
-plt.title("Répartition par tranches de magnitude et classe (tsunami 0/1)")
-plt.xlabel("Tranche de magnitude"); plt.ylabel("Nombre")
-plt.tight_layout()
-plt.show()
+# Plot removed - see notebook for visualizations
+# plt.figure()
+# mag_cls.plot(kind="bar", stacked=True)
+# plt.title("Répartition par tranches de magnitude et classe (tsunami 0/1)")
+# plt.xlabel("Tranche de magnitude"); plt.ylabel("Nombre")
+# plt.tight_layout()
+# plt.show()
 
 # Statistical Summary by Class
 # Finally, we provide a comprehensive quantitative comparison of all features between the two classes to identify the most discriminative features for our classification task.
@@ -211,24 +219,26 @@ country_cls = (df[df["country"].isin(top15)]
 country_cls
 
 # Country-Level Tsunami Rates
-# This code creates a stacked bar chart showing the distribution of tsunami versus non-tsunami events for the top 15 countries, allowing us to see which countries have higher tsunami rates. This reveals geographic patterns in tsunami occurrence, as countries with higher proportions of tsunami events might share geographic characteristics such as coastal regions or tectonic plate boundaries that could be predictive. This analysis helps identify if country or region is a useful feature for our models. The resulting stacked bar chart has countries on the x-axis, with each bar showing the proportion of tsunami (class 1) versus non-tsunami (class 0) events, revealing which countries have higher tsunami rates and potential geographic risk factors that might influence tsunami occurrence.
+# This code creates a stacked bar chart showing the distribution of tsunami versus non-tsunami events for the top 15 countries, so we could see which countries have higher tsunami rates. This reveals geographic patterns in tsunami occurrence, as countries with higher proportions of tsunami events might share geographic characteristics such as coastal regions or tectonic plate boundaries that could be predictive. This analysis helps identify if country or region is a useful feature for our models. The resulting stacked bar chart has countries on the x-axis, with each bar showing the proportion of tsunami (class 1) versus non-tsunami (class 0) events, revealing which countries have higher tsunami rates and potential geographic risk factors that might influence tsunami occurrence.
 
-plt.figure()
-country_counts.head(15).plot(kind="bar")
-plt.title("Top 15 pays par nombre d'événements (global)")
-plt.xlabel("Pays"); plt.ylabel("Nombre")
-plt.tight_layout()
-plt.show()
+# Plot removed - see notebook for visualizations
+# plt.figure()
+# country_counts.head(15).plot(kind="bar")
+# plt.title("Top 15 pays par nombre d'événements (global)")
+# plt.xlabel("Pays"); plt.ylabel("Nombre")
+# plt.tight_layout()
+# plt.show()
 
 # Statistical Summary by Class
 # This code calculates comprehensive statistics (mean, standard deviation, median, min, max) for all numeric features, grouped by tsunami class, providing a detailed comparison of feature distributions between classes. This quantitative comparison helps identify which features show the most significant differences between tsunami and non-tsunami events, where features with large differences in means or medians are likely to be more predictive. This analysis complements the visualizations with precise numerical comparisons that can guide feature selection and model development. The resulting multi-level table shows statistical measures for each numeric feature with separate columns for each class, where large differences in means or medians between classes indicate highly discriminative features for tsunami prediction.
 
-plt.figure()
-country_cls.plot(kind="bar", stacked=True)
-plt.title("Top 15 pays — répartition par classe (tsunami 0/1)")
-plt.xlabel("Pays"); plt.ylabel("Nombre")
-plt.tight_layout()
-plt.show()
+# Plot removed - see notebook for visualizations
+# plt.figure()
+# country_cls.plot(kind="bar", stacked=True)
+# plt.title("Top 15 pays — répartition par classe (tsunami 0/1)")
+# plt.xlabel("Pays"); plt.ylabel("Nombre")
+# plt.tight_layout()
+# plt.show()
 
 TARGET = "tsunami"
 num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
@@ -355,10 +365,19 @@ for i, (name, step) in enumerate(preprocessing_pipeline.steps, 1):
 split_year = 2018
 train_mask = df['Year'] < split_year
 test_mask = df['Year'] >= split_year
-X_train = X[train_mask].copy()
+
+# Sort training data by temporal order (Year, Month) for TimeSeriesSplit
+# Create a combined dataframe to sort by Year and Month
+train_df_temp = df[train_mask].copy()
+train_df_sorted = train_df_temp.sort_values(['Year', 'Month']).reset_index(drop=True)
+sorted_indices = train_df_sorted.index
+
+# Reindex X and y based on sorted order
+X_train = X[train_mask].iloc[sorted_indices].reset_index(drop=True)
+y_train = y[train_mask].iloc[sorted_indices].reset_index(drop=True)
 X_test = X[test_mask].copy()
-y_train = y[train_mask].copy()
 y_test = y[test_mask].copy()
+
 print(f"Temporal split (split year: {split_year}):")
 print(f"  Training set: {X_train.shape[0]} samples ({train_mask.sum() / len(df):.1%})")
 print(f"  Test set: {X_test.shape[0]} samples ({test_mask.sum() / len(df):.1%})")
@@ -366,6 +385,7 @@ print(f"\nTraining target distribution:")
 print(y_train.value_counts())
 print(f"\nTest target distribution:")
 print(y_test.value_counts())
+print(f"\nTraining data sorted by Year and Month for TimeSeriesSplit cross-validation")
 
 # Model Definitions
 # Define multiple classification models to compare performance.
@@ -555,11 +575,15 @@ if best_model_type in param_grids:
     print(f"Method: {OPTIMIZATION_METHOD}")
     print(f"Parameter grid: {list(param_grid.keys())}")
     
+    # Use TimeSeriesSplit for temporal cross-validation
+    tscv = TimeSeriesSplit(n_splits=5)
+    print(f"Using TimeSeriesSplit with {tscv.n_splits} splits (respects temporal order)")
+    
     if OPTIMIZATION_METHOD == 'grid':
         grid_search = GridSearchCV(
             trained_pipelines[best_model_type],
             param_grid,
-            cv=5,
+            cv=tscv,
             scoring='f1',
             n_jobs=-1,
             verbose=1
@@ -578,7 +602,7 @@ if best_model_type in param_grids:
             trained_pipelines[best_model_type],
             param_grid,
             n_iter=50,
-            cv=5,
+            cv=tscv,
             scoring='f1',
             n_jobs=-1,
             random_state=42,
@@ -625,7 +649,9 @@ if best_model_type in param_grids:
                     ('classifier', type(base_model)(**{k.replace('classifier__', ''): v for k, v in params.items()}))
                 ])
                 
-                scores = cross_val_score(pipeline, X_train, y_train, cv=5, scoring='f1', n_jobs=-1)
+                # Use TimeSeriesSplit for temporal cross-validation
+                tscv = TimeSeriesSplit(n_splits=5)
+                scores = cross_val_score(pipeline, X_train, y_train, cv=tscv, scoring='f1', n_jobs=-1)
                 return scores.mean()
             
             study = optuna.create_study(direction='maximize')
@@ -646,10 +672,12 @@ if best_model_type in param_grids:
         
         except ImportError:
             print("⚠ Optuna not available. Falling back to Grid Search...")
+            # Use TimeSeriesSplit for temporal cross-validation
+            tscv = TimeSeriesSplit(n_splits=5)
             grid_search = GridSearchCV(
                 trained_pipelines[best_model_type],
                 param_grid,
-                cv=5,
+                cv=tscv,
                 scoring='f1',
                 n_jobs=-1,
                 verbose=1
@@ -697,50 +725,52 @@ cm_df = pd.DataFrame(cm,
                      index=['Actual: No Tsunami', 'Actual: Tsunami'],
                      columns=['Predicted: No Tsunami', 'Predicted: Tsunami'])
 print(cm_df)
-plt.figure(figsize=(8, 6))
-plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-plt.title(f'Confusion Matrix - {best_model}')
-plt.colorbar()
-tick_marks = np.arange(2)
-plt.xticks(tick_marks, ['No Tsunami', 'Tsunami'])
-plt.yticks(tick_marks, ['No Tsunami', 'Tsunami'])
-plt.ylabel('True Label')
-plt.xlabel('Predicted Label')
-thresh = cm.max() / 2.
-for i, j in np.ndindex(cm.shape):
-    plt.text(j, i, format(cm[i, j], 'd'),
-             horizontalalignment="center",
-             color="white" if cm[i, j] > thresh else "black")
-plt.tight_layout()
-plt.show()
+# Plot removed - see notebook for visualizations
+# plt.figure(figsize=(8, 6))
+# plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+# plt.title(f'Confusion Matrix - {best_model}')
+# plt.colorbar()
+# tick_marks = np.arange(2)
+# plt.xticks(tick_marks, ['No Tsunami', 'Tsunami'])
+# plt.yticks(tick_marks, ['No Tsunami', 'Tsunami'])
+# plt.ylabel('True Label')
+# plt.xlabel('Predicted Label')
+# thresh = cm.max() / 2.
+# for i, j in np.ndindex(cm.shape):
+#     plt.text(j, i, format(cm[i, j], 'd'),
+#              horizontalalignment="center",
+#              color="white" if cm[i, j] > thresh else "black")
+# plt.tight_layout()
+# plt.show()
 
 # ROC and Precision-Recall Curves
 # Visualize model performance using ROC and Precision-Recall curves.
+# Plot removed - see notebook for visualizations
 
-plt.figure(figsize=(12, 5))
-plt.subplot(1, 2, 1)
-for model_name, metrics in results.items():
-    fpr, tpr, _ = roc_curve(y_test, metrics['y_pred_proba'])
-    plt.plot(fpr, tpr, label=f"{model_name} (AUC = {metrics['roc_auc']:.3f})", linewidth=2)
-plt.plot([0, 1], [0, 1], 'k--', label='Random Classifier')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('ROC Curves')
-plt.legend(loc="lower right")
-plt.grid(alpha=0.3)
-plt.subplot(1, 2, 2)
-for model_name, metrics in results.items():
-    precision, recall, _ = precision_recall_curve(y_test, metrics['y_pred_proba'])
-    plt.plot(recall, precision, label=f"{model_name}", linewidth=2)
-plt.xlabel('Recall')
-plt.ylabel('Precision')
-plt.title('Precision-Recall Curves')
-plt.legend(loc="lower left")
-plt.grid(alpha=0.3)
-plt.tight_layout()
-plt.show()
+# plt.figure(figsize=(12, 5))
+# plt.subplot(1, 2, 1)
+# for model_name, metrics in results.items():
+#     fpr, tpr, _ = roc_curve(y_test, metrics['y_pred_proba'])
+#     plt.plot(fpr, tpr, label=f"{model_name} (AUC = {metrics['roc_auc']:.3f})", linewidth=2)
+# plt.plot([0, 1], [0, 1], 'k--', label='Random Classifier')
+# plt.xlim([0.0, 1.0])
+# plt.ylim([0.0, 1.05])
+# plt.xlabel('False Positive Rate')
+# plt.ylabel('True Positive Rate')
+# plt.title('ROC Curves')
+# plt.legend(loc="lower right")
+# plt.grid(alpha=0.3)
+# plt.subplot(1, 2, 2)
+# for model_name, metrics in results.items():
+#     precision, recall, _ = precision_recall_curve(y_test, metrics['y_pred_proba'])
+#     plt.plot(recall, precision, label=f"{model_name}", linewidth=2)
+# plt.xlabel('Recall')
+# plt.ylabel('Precision')
+# plt.title('Precision-Recall Curves')
+# plt.legend(loc="lower left")
+# plt.grid(alpha=0.3)
+# plt.tight_layout()
+# plt.show()
 
 # Feature Importance (for Tree-based Models)
 # Analyze feature importance for interpretable models.
@@ -764,15 +794,16 @@ for model_name in tree_models:
             print("=" * 100)
             print(feature_importance_df.head(10))
             
-            plt.figure(figsize=(10, 6))
-            top_features = feature_importance_df.head(15)
-            plt.barh(range(len(top_features)), top_features['importance'].values)
-            plt.yticks(range(len(top_features)), top_features['feature'].values)
-            plt.xlabel('Importance')
-            plt.title(f'Feature Importance - {model_name}')
-            plt.gca().invert_yaxis()
-            plt.tight_layout()
-            plt.show()
+            # Plot removed - see notebook for visualizations
+            # plt.figure(figsize=(10, 6))
+            # top_features = feature_importance_df.head(15)
+            # plt.barh(range(len(top_features)), top_features['importance'].values)
+            # plt.yticks(range(len(top_features)), top_features['feature'].values)
+            # plt.xlabel('Importance')
+            # plt.title(f'Feature Importance - {model_name}')
+            # plt.gca().invert_yaxis()
+            # plt.tight_layout()
+            # plt.show()
 
 #======================================================================
 # PART 6: MODEL PERSISTENCE AND DEPLOYMENT
@@ -834,7 +865,7 @@ print("3. Probabilities: probabilities = pipeline.predict_proba(new_data)")
 #======================================================================
 
 # Generate Scenarios for 2023
-# We create realistic earthquake scenarios for 2023 by sampling from the historical distribution of features. This approach ensures that our predictions are based on plausible combinations of earthquake characteristics that have been observed in the past. We generate multiple scenarios covering different magnitude ranges, depths, and geographic locations to comprehensively assess tsunami risk.
+# We create realistic earthquake scenarios for 2023 by sampling from the historical distribution of features. This approach made sure that our predictions are based on plausible combinations of earthquake characteristics that have been observed in the past. We generate multiple scenarios covering different magnitude ranges, depths, and geographic locations to comprehensively assess tsunami risk.
 
 magnitude_range = np.linspace(df['magnitude'].min(), df['magnitude'].max(), 10)
 depth_range = np.linspace(df['depth'].min(), df['depth'].max(), 8)
@@ -930,7 +961,7 @@ top_10_display['longitude'] = top_10_display['longitude'].apply(lambda x: f"{x:.
 print(top_10_display)
 
 # Detailed Analysis of Top 10 Scenarios
-# This section provides a detailed breakdown of the top 10 most probable tsunami scenarios, showing all relevant features for each scenario. This detailed view helps understand what combinations of earthquake characteristics our model considers most dangerous for tsunami generation.
+# We a detailed breakdown of the top 10 most probable tsunami scenarios, showing all relevant features for each scenario. This detailed view helps understand what combinations of earthquake characteristics our model considers most dangerous for tsunami generation.
 
 print("=" * 100)
 print("DETAILED FEATURES OF TOP 10 TSUNAMI SCENARIOS")
@@ -960,77 +991,78 @@ print(f"Minimum Probability:     {top_10_scenarios['tsunami_probability'].min():
 print(f"Maximum Probability:     {top_10_scenarios['tsunami_probability'].max():.4f} ({top_10_scenarios['tsunami_probability'].max()*100:.2f}%)")
 
 # Visualization of Top 10 Scenarios
-# We visualize the top 10 scenarios on a map to show their geographic distribution, and create a bar chart showing their tsunami probabilities. This helps identify geographic patterns and understand the relative risk levels of different scenarios.
+# We visualize the top 10 scenarios on a map to show their geographic distribution, and create a bar chart showing their tsunami probabilities. This helped us identify geographic patterns and understand the relative risk levels of different scenarios.
+# All plots removed - see notebook for visualizations
 
-fig, axes = plt.subplots(1, 2, figsize=(16, 6))
-# Plot 1: Geographic distribution
-ax1 = axes[0]
-scatter = ax1.scatter(top_10_scenarios['longitude'], top_10_scenarios['latitude'], 
-                     c=top_10_scenarios['tsunami_probability'], 
-                     s=top_10_scenarios['magnitude']*50, 
-                     cmap='Reds', alpha=0.7, edgecolors='black', linewidth=1.5)
-ax1.set_xlabel('Longitude', fontsize=12)
-ax1.set_ylabel('Latitude', fontsize=12)
-ax1.set_title('Geographic Distribution of Top 10 Tsunami Scenarios (2023)', fontsize=14, fontweight='bold')
-ax1.grid(True, alpha=0.3)
-plt.colorbar(scatter, ax=ax1, label='Tsunami Probability')
-for idx, (i, row) in enumerate(top_10_scenarios.iterrows(), 1):
-    ax1.annotate(f'#{idx}', 
-                (row['longitude'], row['latitude']),
-                fontsize=10, fontweight='bold',
-                ha='center', va='center',
-                color='white' if row['tsunami_probability'] > 0.5 else 'black')
-# Plot 2: Probability bar chart
-ax2 = axes[1]
-colors = plt.cm.Reds(top_10_scenarios['tsunami_probability'].values / top_10_scenarios['tsunami_probability'].max())
-bars = ax2.barh(range(10, 0, -1), top_10_scenarios['tsunami_probability'].values, color=colors)
-ax2.set_yticks(range(10, 0, -1))
-ax2.set_yticklabels([f"Scenario #{i}" for i in range(1, 11)])
-ax2.set_xlabel('Tsunami Probability', fontsize=12)
-ax2.set_title('Tsunami Probabilities - Top 10 Scenarios', fontsize=14, fontweight='bold')
-ax2.set_xlim(0, 1)
-ax2.grid(True, alpha=0.3, axis='x')
-for i, (idx, row) in enumerate(top_10_scenarios.iterrows()):
-    ax2.text(row['tsunami_probability'] + 0.02, 10-i, 
-            f"{row['tsunami_probability']:.3f}",
-            va='center', fontweight='bold')
-plt.tight_layout()
-plt.show()
-fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-# Magnitude distribution
-axes[0, 0].hist(top_10_scenarios['magnitude'], bins=5, edgecolor='black', alpha=0.7)
-axes[0, 0].set_xlabel('Magnitude')
-axes[0, 0].set_ylabel('Frequency')
-axes[0, 0].set_title('Magnitude Distribution (Top 10)')
-axes[0, 0].grid(True, alpha=0.3)
-# Depth distribution
-axes[0, 1].hist(top_10_scenarios['depth'], bins=5, edgecolor='black', alpha=0.7, color='orange')
-axes[0, 1].set_xlabel('Depth (km)')
-axes[0, 1].set_ylabel('Frequency')
-axes[0, 1].set_title('Depth Distribution (Top 10)')
-axes[0, 1].grid(True, alpha=0.3)
-# Magnitude vs Depth scatter
-scatter2 = axes[1, 0].scatter(top_10_scenarios['magnitude'], top_10_scenarios['depth'],
-                              c=top_10_scenarios['tsunami_probability'],
-                              s=100, cmap='Reds', edgecolors='black', linewidth=1.5)
-axes[1, 0].set_xlabel('Magnitude')
-axes[1, 0].set_ylabel('Depth (km)')
-axes[1, 0].set_title('Magnitude vs Depth (Top 10)')
-axes[1, 0].grid(True, alpha=0.3)
-plt.colorbar(scatter2, ax=axes[1, 0], label='Tsunami Probability')
-# Probability distribution
-axes[1, 1].bar(range(1, 11), top_10_scenarios['tsunami_probability'].values, 
-               color=plt.cm.Reds(top_10_scenarios['tsunami_probability'].values))
-axes[1, 1].set_xlabel('Scenario Rank')
-axes[1, 1].set_ylabel('Tsunami Probability')
-axes[1, 1].set_title('Probability by Rank')
-axes[1, 1].set_xticks(range(1, 11))
-axes[1, 1].grid(True, alpha=0.3, axis='y')
-plt.tight_layout()
-plt.show()
+# fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+# # Plot 1: Geographic distribution
+# ax1 = axes[0]
+# scatter = ax1.scatter(top_10_scenarios['longitude'], top_10_scenarios['latitude'], 
+#                      c=top_10_scenarios['tsunami_probability'], 
+#                      s=top_10_scenarios['magnitude']*50, 
+#                      cmap='Reds', alpha=0.7, edgecolors='black', linewidth=1.5)
+# ax1.set_xlabel('Longitude', fontsize=12)
+# ax1.set_ylabel('Latitude', fontsize=12)
+# ax1.set_title('Geographic Distribution of Top 10 Tsunami Scenarios (2023)', fontsize=14, fontweight='bold')
+# ax1.grid(True, alpha=0.3)
+# plt.colorbar(scatter, ax=ax1, label='Tsunami Probability')
+# for idx, (i, row) in enumerate(top_10_scenarios.iterrows(), 1):
+#     ax1.annotate(f'#{idx}', 
+#                 (row['longitude'], row['latitude']),
+#                 fontsize=10, fontweight='bold',
+#                 ha='center', va='center',
+#                 color='white' if row['tsunami_probability'] > 0.5 else 'black')
+# # Plot 2: Probability bar chart
+# ax2 = axes[1]
+# colors = plt.cm.Reds(top_10_scenarios['tsunami_probability'].values / top_10_scenarios['tsunami_probability'].max())
+# bars = ax2.barh(range(10, 0, -1), top_10_scenarios['tsunami_probability'].values, color=colors)
+# ax2.set_yticks(range(10, 0, -1))
+# ax2.set_yticklabels([f"Scenario #{i}" for i in range(1, 11)])
+# ax2.set_xlabel('Tsunami Probability', fontsize=12)
+# ax2.set_title('Tsunami Probabilities - Top 10 Scenarios', fontsize=14, fontweight='bold')
+# ax2.set_xlim(0, 1)
+# ax2.grid(True, alpha=0.3, axis='x')
+# for i, (idx, row) in enumerate(top_10_scenarios.iterrows()):
+#     ax2.text(row['tsunami_probability'] + 0.02, 10-i, 
+#             f"{row['tsunami_probability']:.3f}",
+#             va='center', fontweight='bold')
+# plt.tight_layout()
+# plt.show()
+# fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+# # Magnitude distribution
+# axes[0, 0].hist(top_10_scenarios['magnitude'], bins=5, edgecolor='black', alpha=0.7)
+# axes[0, 0].set_xlabel('Magnitude')
+# axes[0, 0].set_ylabel('Frequency')
+# axes[0, 0].set_title('Magnitude Distribution (Top 10)')
+# axes[0, 0].grid(True, alpha=0.3)
+# # Depth distribution
+# axes[0, 1].hist(top_10_scenarios['depth'], bins=5, edgecolor='black', alpha=0.7, color='orange')
+# axes[0, 1].set_xlabel('Depth (km)')
+# axes[0, 1].set_ylabel('Frequency')
+# axes[0, 1].set_title('Depth Distribution (Top 10)')
+# axes[0, 1].grid(True, alpha=0.3)
+# # Magnitude vs Depth scatter
+# scatter2 = axes[1, 0].scatter(top_10_scenarios['magnitude'], top_10_scenarios['depth'],
+#                               c=top_10_scenarios['tsunami_probability'],
+#                               s=100, cmap='Reds', edgecolors='black', linewidth=1.5)
+# axes[1, 0].set_xlabel('Magnitude')
+# axes[1, 0].set_ylabel('Depth (km)')
+# axes[1, 0].set_title('Magnitude vs Depth (Top 10)')
+# axes[1, 0].grid(True, alpha=0.3)
+# plt.colorbar(scatter2, ax=axes[1, 0], label='Tsunami Probability')
+# # Probability distribution
+# axes[1, 1].bar(range(1, 11), top_10_scenarios['tsunami_probability'].values, 
+#                color=plt.cm.Reds(top_10_scenarios['tsunami_probability'].values))
+# axes[1, 1].set_xlabel('Scenario Rank')
+# axes[1, 1].set_ylabel('Tsunami Probability')
+# axes[1, 1].set_title('Probability by Rank')
+# axes[1, 1].set_xticks(range(1, 11))
+# axes[1, 1].grid(True, alpha=0.3, axis='y')
+# plt.tight_layout()
+# plt.show()
 
 # Save Predictions
-# We save the top 10 scenarios and all predictions to a CSV file for further analysis and reference. This allows for easy sharing of results and integration with other systems or reports.
+# We save the top 10 scenarios and all predictions to a CSV file for further analysis and reference. This made it for easy sharing of results and integration with other systems or reports.
 
 current_dir = Path().resolve()
 if current_dir.name == "Codes (.ipynb & .py)":

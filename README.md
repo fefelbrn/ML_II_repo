@@ -63,7 +63,9 @@ ML_II_repo/
 ├── data/
 │   └── earthquake_data_tsunami.csv    # Main dataset
 ├── Codes (.ipynb & .py)/
-│   └── test.ipynb                     # Complete ML pipeline notebook
+│   ├── test.ipynb                     # Initial exploration notebook
+│   ├── projet.ipynb                   # Complete ML pipeline notebook (main)
+│   └── projet.py                      # Python script version (no plots)
 ├── outputs/                           # Model outputs and predictions
 │   ├── best_pipeline.joblib          # Best trained model
 │   ├── all_pipelines.joblib           # All trained models
@@ -78,7 +80,7 @@ ML_II_repo/
 
 ## Notebook Structure
 
-The main notebook (`test.ipynb`) is organized into 7 comprehensive parts:
+The main notebook (`projet.ipynb`) is organized into 7 comprehensive parts:
 
 ### Part 1: Exploratory Data Analysis
 - Initial data inspection and summary statistics
@@ -209,7 +211,7 @@ pip install -r requirements.txt
 jupyter notebook
 ```
 
-2. **Open the notebook**: Navigate to `Codes (.ipynb & .py)/test.ipynb`
+2. **Open the notebook**: Navigate to `Codes (.ipynb & .py)/projet.ipynb`
 
 3. **Run all cells**: The first cell will install all dependencies from `requirements.txt`
 
