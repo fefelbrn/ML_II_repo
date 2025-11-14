@@ -1,0 +1,10 @@
+"""
+Project path configuration file - EXAMPLE
+
+Copy this file to project_path.py and update the pathrepo variable with your local project path.
+The project_path.py file is in .gitignore and will not be committed to GitHub.
+"""
+
+# Update this path to match your local project directory
+pathrepo = "/path/to/your/ML_II_repo"
+

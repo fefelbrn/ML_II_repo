@@ -1,4 +1,5 @@
 .venv
 outputs
 mlruns
-ANALYSES_PROBLEMES.md
+ANALYSE_PROBLEMES.md
+project_path.py
